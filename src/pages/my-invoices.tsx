@@ -2,10 +2,9 @@ import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import MainLayout from "../layouts/MainLayout";
 
-const Home: NextPage = () => {
-  const { data: session } = useSession();
+const Index: NextPage = () => {
 
   return <MainLayout>hahaha</MainLayout>;
 };
 
-export default Home;
+export default Index;
