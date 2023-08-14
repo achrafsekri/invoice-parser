@@ -6,6 +6,7 @@ import "  /styles/globals.css";
 import AuthWrapper from "  /auth/AuthWrapper";
 import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css"; 
 import { useEffect } from "react";
 import { ToastProvider } from "  /Context/ToastContext";
 import 'material-symbols';
@@ -14,10 +15,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  useEffect(() => {
-    // ts-ignore
-    import("preline");
-  }, []);
+  
   return (
     <SessionProvider session={session}>
       <ToastProvider>

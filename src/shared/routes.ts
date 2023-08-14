@@ -15,11 +15,25 @@ export const routes: Route[] = [
     icon: "description",
   },
   {
+    href: "/receipt",
+    lable: "Parse a receipt",
+    exact: true,
+    type: "simple",
+    icon: "receipt_long",
+  },
+  {
     href: "/my-invoices",
     lable: "My invoices",
     exact: true,
     type: "simple",
     icon: "folder",
+  },
+  {
+    href: "/my-receipts",
+    lable: "My receipts",
+    exact: true,
+    type: "simple",
+    icon: "home_storage",
   },
 
   // {
