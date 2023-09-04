@@ -28,8 +28,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -67,7 +66,7 @@ model Invoice {
   userId      String
   title       String
   description String
-  total      String
+  total       String
   company     String
   invoiceinfo String
   currency    String
@@ -84,7 +83,7 @@ model Receipt {
   userId      String
   title       String
   description String
-  total      String
+  total       String
   currency    String
   status      String
   image       String

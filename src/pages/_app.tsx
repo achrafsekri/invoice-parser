@@ -10,6 +10,8 @@ import "primereact/resources/primereact.min.css";
 import { useEffect } from "react";
 import { ToastProvider } from "  /Context/ToastContext";
 import 'material-symbols';
+import 'primeicons/primeicons.css';
+        
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
