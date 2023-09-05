@@ -6,27 +6,32 @@ import "  /styles/globals.css";
 import AuthWrapper from "  /auth/AuthWrapper";
 import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
-import "primereact/resources/primereact.min.css"; 
+import "primereact/resources/primereact.min.css";
 import { useEffect } from "react";
 import { ToastProvider } from "  /Context/ToastContext";
-import 'material-symbols';
-import 'primeicons/primeicons.css';
-        
+import "material-symbols";
+import "primeicons/primeicons.css";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  
+  const queryClient = new QueryClient();
+
   return (
     <SessionProvider session={session}>
-      <ToastProvider>
-        <PrimeReactProvider>
-          <AuthWrapper>
-            <Component {...pageProps} />
-          </AuthWrapper>
-        </PrimeReactProvider>
-      </ToastProvider>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <PrimeReactProvider>
+            <AuthWrapper>
+              <Component {...pageProps} />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </AuthWrapper>
+          </PrimeReactProvider>
+        </ToastProvider>
+      </QueryClientProvider>
     </SessionProvider>
   );
 };
