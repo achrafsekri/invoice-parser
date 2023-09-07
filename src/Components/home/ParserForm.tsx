@@ -1,4 +1,5 @@
-import { parseInvoice } from "  /shared/apiCalls";
+import { createInvoice, parseInvoice } from "  /shared/apiCalls";
+import { useSession } from "next-auth/react";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
@@ -15,17 +16,17 @@ const ParserForm = () => {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState(null);
   const fileUploadRef = React.useRef(null);
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      title: "",
-      image: "",
-    },
-  });
+  const session = useSession();
+  const userId = session?.data?.user.id;
+  console.log("session", session);
+  const { control, handleSubmit, watch, formState, getValues } =
+    useForm<Inputs>({
+      defaultValues: {
+        title: "",
+        image: "",
+      },
+    });
+  console.log("getValues", formState);
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     setLoading(true);
     const token = localStorage.getItem("csrfToken");
@@ -35,9 +36,23 @@ const ParserForm = () => {
 
     parseInvoice(formData, token)
       .then((res) => {
-        console.log("res", res.data);
-        setData(res.data);
-        setLoading(false);
+        setData(res.data[0]);
+        const invoice = {
+          userId: userId,
+          info: JSON.stringify(res.data[0].detected_text),
+          image: res.data[0].image_base64,
+        };
+        createInvoice(invoice)
+          .then((res) => {
+            console.log("res", res);
+
+            setLoading(false);
+          })
+          .catch((err) => {
+            console.log("err in creating", err);
+
+            setLoading(false);
+          });
       })
       .catch((err) => {
         console.log("err", err);
@@ -142,14 +157,34 @@ const ParserForm = () => {
                 />
               </div>
               <div className="mt-6 flex gap-4 ">
-                <Button label="Submit" loading={loading} />
+                <Button
+                  label="Submit"
+                  loading={loading}
+                  disabled={!formState.isValid}
+                />
                 <Button label="Cancel" severity="danger" outlined />
               </div>
             </form>
           </div>
         </div>
       )}
-      {data && <div dangerouslySetInnerHTML={{ __html: data }}></div>}
+      {data && (
+        <div>
+          <img
+            src={`data:image/jpeg;base64,${data.image_base64}`}
+            alt="image"
+          />
+          <div>
+            {Object.entries(data.detected_text).map(([key, value]) => {
+              return (
+                <div>
+                  {key} : {value[0]}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

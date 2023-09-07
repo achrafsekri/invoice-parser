@@ -4,6 +4,12 @@ type Token = {
   csrfToken: string;
 };
 
+type SentInvoice = {
+  userId: string;
+  info: string;
+  image: string;
+};
+
 export const getToken = async () => {
   const data = new FormData();
 
@@ -36,6 +42,39 @@ export const parseInvoice = async (invoice, token) => {
       "X-CSRFToken": token,
       Cookie: "csrftoken=1xtMb2GprvXcppXJDVKnFwB4qdcaj5Tq",
       "Content-Type": "multipart/form-data",
+    },
+    data: invoice,
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const getInvoices = async (userId: string) => {
+  const config = {
+    method: "get",
+    url: `http://localhost:3000/invoice/${userId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+    return [];
+  });
+  return response;
+};
+
+export const createInvoice = async (invoice: SentInvoice) => {
+  console.log("invoice", invoice);
+  const config = {
+    method: "post",
+    url: "http://localhost:3000/invoice",
+    headers: {
+      "Content-Type": "application/json",
     },
     data: invoice,
   };
