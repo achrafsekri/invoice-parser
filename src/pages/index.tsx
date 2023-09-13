@@ -8,7 +8,7 @@ const Home: NextPage = () => {
 
   return (
     <MainLayout>
-      <ParserForm />
+      <ParserForm paperType="Parse an Invoice" />
     </MainLayout>
   );
 };

@@ -12,7 +12,7 @@ type Inputs = {
   image: string;
 };
 
-const ParserForm = () => {
+const ParserForm = ({ paperType }) => {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState(null);
   const fileUploadRef = React.useRef(null);
@@ -68,8 +68,8 @@ const ParserForm = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-2 border-t border-gray-200 py-8 first:border-transparent first:pt-0 last:pb-0  sm:grid-cols-12 sm:gap-4">
                 <div className="sm:col-span-12">
-                  <h2 className="text-lg font-semibold text-gray-800 ">
-                    Parse invoice
+                  <h2 className="text-center text-4xl font-semibold text-gray-400">
+                    {paperType}
                   </h2>
                 </div>
               </div>
