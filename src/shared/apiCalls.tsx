@@ -10,12 +10,18 @@ type SentInvoice = {
   image: string;
 };
 
+type SentReceipt = {
+  userId: string;
+  info: string;
+  image: string;
+};
+
 export const getToken = async () => {
   const data = new FormData();
 
   const config = {
     method: "get",
-    url: "http://localhost:8000/csrf",
+    url: "127.0.0.1:8000/csrf",
     headers: {
       Cookie: "csrftoken=1xtMb2GprvXcppXJDVKnFwB4qdcaj5Tq",
       "X-CSRFToken": "1xtMb2GprvXcppXJDVKnFwB4qdcaj5Tq",
@@ -37,7 +43,7 @@ export const parseInvoice = async (invoice, token) => {
   console.log("token", token);
   const config = {
     method: "post",
-    url: "http://localhost:8000/test",
+    url: "http://127.0.0.1:8000/inv",
     headers: {
       "X-CSRFToken": token,
       Cookie: "csrftoken=1xtMb2GprvXcppXJDVKnFwB4qdcaj5Tq",
@@ -55,7 +61,7 @@ export const parseInvoice = async (invoice, token) => {
 export const getInvoices = async (userId: string) => {
   const config = {
     method: "get",
-    url: `http://localhost:3000/invoice/${userId}`,
+    url: `http://localhost:3000/api/invoice/${userId}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -72,7 +78,7 @@ export const createInvoice = async (invoice: SentInvoice) => {
   console.log("invoice", invoice);
   const config = {
     method: "post",
-    url: "http://localhost:3000/invoice",
+    url: "http://localhost:3000/api/invoice",
     headers: {
       "Content-Type": "application/json",
     },
@@ -81,6 +87,141 @@ export const createInvoice = async (invoice: SentInvoice) => {
 
   const response = await axios(config).catch((err) => {
     console.log("err", err);
+  });
+  return response;
+};
+
+export const deleteInvoice = async (invoiceId: string) => {
+  const config = {
+    method: "delete",
+    url: `http://localhost:3000/api/invoice/${invoiceId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const updateInvoice = async (
+  invoice: SentInvoice,
+  invoiceId: string
+) => {
+  console.log("invoice", invoice);
+  const config = {
+    method: "put",
+    url: `http://localhost:3000/api/invoice/${invoiceId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: invoice,
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const getInvoice = async (invoiceId: string) => {
+  const config = {
+    method: "get",
+    url: `http://localhost:3000/api/invoice/${invoiceId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+    return [];
+  });
+  return response;
+};
+
+export const createReceipt = async (receipt: SentReceipt) => {
+  console.log("receipt", receipt);
+  const config = {
+    method: "post",
+    url: "http://localhost:3000/api/receipt",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: receipt,
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const getReceipts = async (userId: string) => {
+  const config = {
+    method: "get",
+    url: `http://localhost:3000/api/receipt/${userId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+    return [];
+  });
+  return response;
+};
+
+export const deleteReceipt = async (receiptId: string) => {
+  const config = {
+    method: "delete",
+    url: `http://localhost:3000/api/receipt/${receiptId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const updateReceipt = async (
+  receipt: SentReceipt,
+  receiptId: string
+) => {
+  console.log("receipt", receipt);
+  const config = {
+    method: "put",
+    url: `http://localhost:3000/api/receipt/${receiptId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: receipt,
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+  });
+  return response;
+};
+
+export const getReceipt = async (receiptId: string) => {
+  const config = {
+    method: "get",
+    url: `http://localhost:3000/api/receipt/${receiptId}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const response = await axios(config).catch((err) => {
+    console.log("err", err);
+    return [];
   });
   return response;
 };

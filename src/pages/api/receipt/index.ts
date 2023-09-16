@@ -8,7 +8,7 @@ type ResponseData = {
 
 type Body = {
   image: string;
-  info: JSON;
+  info: string;
   userId: string;
 };
 
@@ -17,13 +17,12 @@ export default function handler(
   res: NextApiResponse<ResponseData>
 ) {
   if (req.method == "POST") {
-    const { info, userId } = req.body as Body;
-    const image = "hello";
-    prisma.invoice
+    const { image, info, userId } = req.body as Body;
+    prisma.receipt
       .create({
         data: {
           image,
-          invoiceinfo: JSON.stringify(info),
+          receiptinfo: info,
           user: {
             connect: {
               id: userId,

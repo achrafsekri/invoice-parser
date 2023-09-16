@@ -39,7 +39,7 @@ const ParserForm = ({ paperType }) => {
         setData(res.data[0]);
         const invoice = {
           userId: userId,
-          info: JSON.stringify(res.data[0].detected_text),
+          info: res.data[0].detected_text,
           image: res.data[0].image_base64,
         };
         createInvoice(invoice)
@@ -131,7 +131,7 @@ const ParserForm = ({ paperType }) => {
                       {...field}
                       ref={fileUploadRef}
                       name="image"
-                      accept="image/*"
+                      accept="image/*,.pdf"
                       maxFileSize={5000000}
                       multiple
                       className="p-d-none"
