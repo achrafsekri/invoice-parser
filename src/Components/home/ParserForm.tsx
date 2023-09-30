@@ -18,7 +18,6 @@ const ParserForm = ({ paperType }) => {
   const fileUploadRef = React.useRef(null);
   const session = useSession();
   const userId = session?.data?.user.id;
-  console.log("session", session);
   const { control, handleSubmit, watch, formState, getValues } =
     useForm<Inputs>({
       defaultValues: {
@@ -26,7 +25,7 @@ const ParserForm = ({ paperType }) => {
         image: "",
       },
     });
-  console.log("getValues", formState);
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     setLoading(true);
     const token = localStorage.getItem("csrfToken");
@@ -41,11 +40,10 @@ const ParserForm = ({ paperType }) => {
           userId: userId,
           info: res.data[0].detected_text,
           image: res.data[0].image_base64,
+          title: data.title,
         };
         createInvoice(invoice)
           .then((res) => {
-            console.log("res", res);
-
             setLoading(false);
           })
           .catch((err) => {
@@ -137,7 +135,6 @@ const ParserForm = ({ paperType }) => {
                       className="p-d-none"
                       customUpload
                       uploadHandler={(e) => {
-                        console.log("uploadHandler", e.files[0]);
                         field.onChange(e);
                       }}
                       onError={(e) => {

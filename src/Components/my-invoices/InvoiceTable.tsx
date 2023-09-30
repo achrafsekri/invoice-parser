@@ -15,18 +15,24 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { useRouter } from "next/router";
+import { useQuery } from "react-query";
+import {
+  getInvoices,
+  deleteInvoice as deleteInvoiceCall,
+} from "  /shared/apiCalls";
+import { useSession } from "next-auth/react";
 
 interface Invoice {
   id: string | null;
-  name: string;
+  title: string;
   description: string;
   image: string | null;
 }
 
-export default function invoicesDemo() {
+export default function InvoicesDemo() {
   const emptyInvoice: Invoice = {
     id: null,
-    name: "",
+    title: "",
     image: null,
     description: "",
   };
@@ -40,10 +46,16 @@ export default function invoicesDemo() {
     useState<boolean>(false);
   const [invoice, setInvoice] = useState<Invoice>(emptyInvoice);
   const [selectedinvoices, setSelectedinvoices] = useState<Invoice[]>([]);
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const toast = useRef<Toast>(null);
   const dt = useRef<DataTable<Invoice[]>>(null);
+  const session = useSession();
+  const userId = session?.data?.user?.id;
+  console.log("userId", userId);
+
+  const { data, isError, isLoading, refetch } = useQuery("invoices", () =>
+    getInvoices(userId)
+  );
 
   useEffect(() => {
     invoiceService
@@ -52,20 +64,8 @@ export default function invoicesDemo() {
       .catch((e) => console.log(e));
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-  };
-
   const openNew = () => {
     router.push("/");
-  };
-
-  const hideDialog = () => {
-    setSubmitted(false);
-    setInvoiceDialog(false);
   };
 
   const hideDeleteInvoiceDialog = () => {
@@ -76,63 +76,33 @@ export default function invoicesDemo() {
     setDeleteinvoicesDialog(false);
   };
 
-  const saveInvoice = () => {
-    setSubmitted(true);
-
-    if (invoice.name.trim()) {
-      const _invoices = [...invoices];
-      const _invoice = { ...invoice };
-
-      if (invoice.id) {
-        const index = findIndexById(invoice.id);
-
-        _invoices[index] = _invoice;
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Invoice Updated",
-          life: 3000,
-        });
-      } else {
-        _invoice.id = createId();
-        _invoice.image = "invoice-placeholder.svg";
-        _invoices.push(_invoice);
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Invoice Created",
-          life: 3000,
-        });
-      }
-
-      setinvoices(_invoices);
-      setInvoiceDialog(false);
-      setInvoice(emptyInvoice);
-    }
-  };
-
-  const editInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice });
-    setInvoiceDialog(true);
-  };
-
   const confirmDeleteInvoice = (invoice: Invoice) => {
     setInvoice(invoice);
     setDeleteInvoiceDialog(true);
   };
 
   const deleteInvoice = () => {
-    let _invoices = invoices.filter((val) => val.id !== invoice.id);
-
-    setinvoices(_invoices);
-    setDeleteInvoiceDialog(false);
-    setInvoice(emptyInvoice);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Invoice Deleted",
-      life: 3000,
-    });
+    deleteInvoiceCall(invoice.id!)
+      .then((res) => {
+        refetch();
+        setDeleteInvoiceDialog(false);
+        setInvoice(emptyInvoice);
+        toast.current?.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "Invoice Deleted",
+          life: 3000,
+        });
+      })
+      .catch((err) => {
+        console.log("err", err);
+        toast.current?.show({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Error deleting invoice",
+          life: 3000,
+        });
+      });
   };
 
   const findIndexById = (id: string) => {
@@ -169,47 +139,32 @@ export default function invoicesDemo() {
   };
 
   const deleteSelectedinvoices = () => {
-    let _invoices = invoices.filter((val) => !selectedinvoices.includes(val));
-
-    setinvoices(_invoices);
-    setDeleteinvoicesDialog(false);
-    setSelectedinvoices([]);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "invoices Deleted",
-      life: 3000,
-    });
-  };
-
-  const onCategoryChange = (e: RadioButtonChangeEvent) => {
-    let _invoice = { ...invoice };
-
-    _invoice["category"] = e.value;
-    setInvoice(_invoice);
-  };
-
-  const onInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const val = (e.target && e.target.value) || "";
-    let _invoice = { ...invoice };
-
-    // @ts-ignore
-    _invoice[`${name}`] = val;
-
-    setInvoice(_invoice);
-  };
-
-  const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
-    const val = e.value || 0;
-    let _invoice = { ...invoice };
-
-    // @ts-ignore
-    _invoice[`${name}`] = val;
-
-    setInvoice(_invoice);
+    // create a promise array
+    const promises = selectedinvoices.map((invoice) =>
+      deleteInvoiceCall(invoice.id!)
+    );
+    // wait for all promises to resolve
+    Promise.all(promises)
+      .then((res) => {
+        refetch();
+        setDeleteinvoicesDialog(false);
+        setSelectedinvoices([]);
+        toast.current?.show({
+          severity: "success",
+          summary: "Successful",
+          detail: "invoices Deleted",
+          life: 3000,
+        });
+      })
+      .catch((err) => {
+        console.log("err", err);
+        toast.current?.show({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Error deleting invoices",
+          life: 3000,
+        });
+      });
   };
 
   const leftToolbarTemplate = () => {
@@ -246,7 +201,7 @@ export default function invoicesDemo() {
   const imageBodyTemplate = (rowData: Invoice) => {
     return (
       <img
-        src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`}
+        src={rowData.image}
         alt={rowData.image!}
         className="shadow-2 border-round"
         style={{ width: "64px" }}
@@ -293,12 +248,7 @@ export default function invoicesDemo() {
       </span>
     </div>
   );
-  const invoiceDialogFooter = (
-    <React.Fragment>
-      <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-      <Button label="Save" icon="pi pi-check" onClick={saveInvoice} />
-    </React.Fragment>
-  );
+
   const deleteInvoiceDialogFooter = (
     <React.Fragment>
       <Button
@@ -335,58 +285,60 @@ export default function invoicesDemo() {
   return (
     <div>
       <Toast ref={toast} />
-      <div className="card">
-        <Toolbar
-          className="mb-4"
-          left={leftToolbarTemplate}
-          right={rightToolbarTemplate}
-        ></Toolbar>
+      {!isLoading && !isError && (
+        <div className="card">
+          <Toolbar
+            className="mb-4"
+            left={leftToolbarTemplate}
+            right={rightToolbarTemplate}
+          ></Toolbar>
 
-        <DataTable
-          ref={dt}
-          value={invoices}
-          selection={selectedinvoices}
-          onSelectionChange={(e) => {
-            if (Array.isArray(e.value)) {
-              setSelectedinvoices(e.value);
-            }
-          }}
-          dataKey="id"
-          paginator
-          rows={10}
-          rowsPerPageOptions={[5, 10, 25]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices"
-          globalFilter={globalFilter}
-          header={header}
-        >
-          <Column selectionMode="multiple" exportable={false}></Column>
+          <DataTable
+            ref={dt}
+            value={data}
+            selection={selectedinvoices}
+            onSelectionChange={(e) => {
+              if (Array.isArray(e.value)) {
+                setSelectedinvoices(e.value);
+              }
+            }}
+            dataKey="id"
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices"
+            globalFilter={globalFilter}
+            header={header}
+          >
+            <Column selectionMode="multiple" exportable={false}></Column>
 
-          <Column
-            field="name"
-            header="Name"
-            sortable
-            style={{ minWidth: "16rem" }}
-          ></Column>
-          <Column
-            field="createdAt"
-            header="Date"
-            sortable
-            style={{ minWidth: "16rem" }}
-          ></Column>
-          <Column
-            field="image"
-            header="Image"
-            body={imageBodyTemplate}
-          ></Column>
+            <Column
+              field="title"
+              header="Title"
+              sortable
+              style={{ minWidth: "16rem" }}
+            ></Column>
+            <Column
+              field="createdAt"
+              header="Date"
+              sortable
+              style={{ minWidth: "16rem" }}
+            ></Column>
+            <Column
+              field="image"
+              header="Image"
+              body={imageBodyTemplate}
+            ></Column>
 
-          <Column
-            body={actionBodyTemplate}
-            exportable={false}
-            style={{ minWidth: "12rem" }}
-          ></Column>
-        </DataTable>
-      </div>
+            <Column
+              body={actionBodyTemplate}
+              exportable={false}
+              style={{ minWidth: "12rem" }}
+            ></Column>
+          </DataTable>
+        </div>
+      )}
 
       <Dialog
         visible={deleteInvoiceDialog}

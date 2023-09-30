@@ -10,25 +10,20 @@ type Body = {
   userId: string;
 };
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  if (req.method == "Get") {
+  if (req.method === "GET") {
     try {
       const { userId } = req.query as Body;
-      prisma.invoice
-        .findMany({
-          where: {
-            userId: userId,
-          },
-        })
-        .then((data) => {
-          res.status(200).json({ message: "success", data });
-        })
-        .catch((error) => {
-          res.status(400).json({ message: "error", data: error });
-        });
+      const response = await prisma.invoice.findMany({
+        where: {
+          userId: userId,
+        },
+      });
+
+      res.status(200).json({ message: "success", data: response });
     } catch (error) {
       res.status(400).json({ message: "error", data: error });
     }

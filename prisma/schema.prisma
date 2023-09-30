@@ -64,7 +64,7 @@ model VerificationToken {
 model Invoice {
   id          String   @id @default(cuid())
   userId      String
-  title       String
+  title       String?
   invoiceinfo Json
   image       String
   createdAt   DateTime @default(now())
@@ -75,7 +75,7 @@ model Invoice {
 model Receipt {
   id          String   @id @default(cuid())
   userId      String
-  title       String
+  title       String?
   image       String
   receiptInfo Json
   createdAt   DateTime @default(now())

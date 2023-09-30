@@ -10,14 +10,14 @@ type Query = {
   invoiceId: string;
 };
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   if (req.method === "GET") {
     try {
       const { invoiceId } = req.query as Query;
-      const invoice = prisma.invoice.findUnique({
+      const invoice = await prisma.invoice.findUnique({
         where: {
           id: invoiceId,
         },
@@ -30,7 +30,7 @@ export default function handler(
   if (req.method === "PUT") {
     try {
       const { invoiceId } = req.query as Query;
-      const invoice = prisma.invoice.findUnique({
+      const invoice = await prisma.invoice.findUnique({
         where: {
           id: invoiceId,
         },
@@ -43,7 +43,7 @@ export default function handler(
   if (req.method === "DELETE") {
     try {
       const { invoiceId } = req.query as Query;
-      const invoice = prisma.invoice.findUnique({
+      const invoice = await prisma.invoice.delete({
         where: {
           id: invoiceId,
         },

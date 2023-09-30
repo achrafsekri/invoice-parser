@@ -61,17 +61,14 @@ export const parseInvoice = async (invoice, token) => {
 export const getInvoices = async (userId: string) => {
   const config = {
     method: "get",
-    url: `http://localhost:3000/api/invoice/${userId}`,
+    url: `http://localhost:3000/api/invoice/user/${userId}`,
     headers: {
       "Content-Type": "application/json",
     },
   };
 
-  const response = await axios(config).catch((err) => {
-    console.log("err", err);
-    return [];
-  });
-  return response;
+  const response = await axios(config);
+  return response.data.data;
 };
 
 export const createInvoice = async (invoice: SentInvoice) => {
@@ -135,11 +132,8 @@ export const getInvoice = async (invoiceId: string) => {
     },
   };
 
-  const response = await axios(config).catch((err) => {
-    console.log("err", err);
-    return [];
-  });
-  return response;
+  const response = await axios(config);
+  return response?.data?.data;
 };
 
 export const createReceipt = async (receipt: SentReceipt) => {
