@@ -10,6 +10,11 @@ type Query = {
   invoiceId: string;
 };
 
+type Body = {
+  invoiceinfo: string;
+  title: string;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
@@ -30,9 +35,14 @@ export default async function handler(
   if (req.method === "PUT") {
     try {
       const { invoiceId } = req.query as Query;
-      const invoice = await prisma.invoice.findUnique({
+      const { invoiceinfo, title } = req.body as Body;
+      const invoice = await prisma.invoice.update({
         where: {
           id: invoiceId,
+        },
+        data: {
+          invoiceinfo,
+          title,
         },
       });
       res.status(200).json({ message: "success", data: invoice });

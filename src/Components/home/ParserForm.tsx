@@ -6,22 +6,28 @@ import { InputText } from "primereact/inputtext";
 import { Tooltip } from "primereact/tooltip";
 import React from "react";
 import { useForm, type SubmitHandler, Controller, set } from "react-hook-form";
+import { Editor } from "primereact/editor";
+import { useRouter } from "next/router";
 
 type Inputs = {
   title: string;
   image: string;
+  invoiceinfo: string;
 };
 
 const ParserForm = ({ paperType }) => {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState(null);
+  const [editor, setEditor] = React.useState("");
   const fileUploadRef = React.useRef(null);
   const session = useSession();
   const userId = session?.data?.user.id;
-  const { control, handleSubmit, watch, formState, getValues } =
+  const router = useRouter();
+  const { control, handleSubmit, watch, formState, getValues, setValue } =
     useForm<Inputs>({
       defaultValues: {
         title: "",
+        invoiceinfo: "",
         image: "",
       },
     });
@@ -35,25 +41,42 @@ const ParserForm = ({ paperType }) => {
 
     parseInvoice(formData, token)
       .then((res) => {
+        // change invoiceinfo value
+        setValue("invoiceinfo", res.data[0].detected_text);
+        setEditor(
+          "<pre>" +
+            Object.entries(res.data[0].detected_text)
+              .map(([key, value]) => {
+                return key + " : " + value[0] + "\n";
+              })
+              .join("") +
+            "</pre>"
+        );
         setData(res.data[0]);
-        const invoice = {
-          userId: userId,
-          info: res.data[0].detected_text,
-          image: res.data[0].image_base64,
-          title: data.title,
-        };
-        createInvoice(invoice)
-          .then((res) => {
-            setLoading(false);
-          })
-          .catch((err) => {
-            console.log("err in creating", err);
-
-            setLoading(false);
-          });
+        setLoading(false);
       })
       .catch((err) => {
         console.log("err", err);
+        setLoading(false);
+      });
+  };
+
+  const upload: SubmitHandler<Inputs> = (typed) => {
+    console.log("data", data);
+    setLoading(true);
+    const invoice = {
+      userId: userId,
+      info: typed.invoiceinfo,
+      image: data.image_base64,
+      title: typed.title,
+    };
+    createInvoice(invoice)
+      .then((res) => {
+        setLoading(false);
+        router.push("/my-invoices");
+      })
+      .catch((err) => {
+        console.log("err in creating", err);
         setLoading(false);
       });
   };
@@ -166,21 +189,44 @@ const ParserForm = ({ paperType }) => {
         </div>
       )}
       {data && (
-        <div>
-          <img
-            src={`data:image/jpeg;base64,${data.image_base64}`}
-            alt="image"
-          />
+        <form onSubmit={handleSubmit(upload)}>
           <div>
-            {Object.entries(data.detected_text).map(([key, value]) => {
-              return (
-                <div>
-                  {key} : {value[0]}
-                </div>
-              );
-            })}
+            <img
+              src={`data:image/jpeg;base64,${data.image_base64}`}
+              alt="image"
+            />
+            <div>
+              {/* {Object.entries(data.detected_text).map(([key, value]) => {
+                return (
+                  <div>
+                    {key} : {value[0]}
+                  </div>
+                );
+              })} */}
+              <div className="card">
+                <Controller
+                  name="invoiceinfo"
+                  control={control}
+                  render={({ field }) => (
+                    <Editor
+                      {...field}
+                      style={{ height: "320px" }}
+                      onTextChange={(e) => {
+                        field.onChange(e.htmlValue);
+                        setEditor(e.htmlValue);
+                      }}
+                      value={editor}
+                    />
+                  )}
+                />
+              </div>
+            </div>
           </div>
-        </div>
+          <div className="mt-6 flex gap-4 ">
+            <Button label="Submit" loading={loading} />
+            <Button label="Cancel" severity="danger" outlined />
+          </div>
+        </form>
       )}
     </div>
   );
