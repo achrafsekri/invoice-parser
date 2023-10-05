@@ -6,9 +6,9 @@ import { routes } from "../../shared/routes";
 
 const SideBar = () => {
   return (
-    <>
+    <div className="">
       {/* <!-- Sidebar Toggle --> */}
-      <div className="sticky inset-x-0 top-0 z-20 border-y bg-white px-4   sm:px-6 md:px-8 lg:hidden">
+      <div className="sticky flex flex-row inset-x-0 top-0 z-20 border-y bg-white px-4   sm:px-6 md:px-8 lg:hidden">
         <div className="flex items-center py-4">
           {/* <!-- Navigation Toggle --> */}
           <button
@@ -72,7 +72,7 @@ const SideBar = () => {
       {/* <!-- Sidebar --> */}
       <div
         id="application-sidebar"
-        className="hs-overlay scrollbar-y  fixed top-0 left-0 bottom-0 z-[60] hidden w-64 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white pt-7 pb-10 transition-all duration-300 hs-overlay-open:translate-x-0   lg:right-auto lg:bottom-0 lg:block lg:translate-x-0"
+        className="hs-overlay scrollbar-y  fixed bottom-0 left-0 top-0 z-[60] hidden w-64 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white pb-10 pt-7 transition-all duration-300 hs-overlay-open:translate-x-0   lg:bottom-0 lg:right-auto lg:block lg:translate-x-0"
       >
         <div className="px-6">
           {/* <!-- Logo --> */}
@@ -84,7 +84,7 @@ const SideBar = () => {
           data-hs-accordion-always-open
         >
           <ul className="space-y-1.5">
-            {routes.map((route,index) => {
+            {routes.map((route, index) => {
               if (route.type === "complex") {
                 return <ComplexRoute key={index} route={route} />;
               } else {
@@ -93,9 +93,14 @@ const SideBar = () => {
             })}
           </ul>
         </nav>
+        <img
+          src="https://cdn.discordapp.com/attachments/999628671608438894/1159637920894943312/B_A-logo-removebg-preview.png?ex=6531bff9&is=651f4af9&hm=ad4eeb9d749d25a49010148bc1703a7b25da7645e64c94fedafb4c40996696d2&"
+          alt="company"
+          className="mx-auto mt-10 w-3/4 mt-64 align-end"
+        />
       </div>
       {/* <!-- End Sidebar --> */}
-    </>
+    </div>
   );
 };
 
