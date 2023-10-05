@@ -80,7 +80,7 @@ const Header = () => {
               </button>
 
               <div className="hs-dropdown relative inline-flex [--placement:bottom-right]">
-                <button
+                {/* <button
                   id="hs-dropdown-with-header"
                   type="button"
                   className="hs-dropdown-toggle inline-flex h-[2.375rem] w-[2.375rem] flex-shrink-0 items-center justify-center gap-2 rounded-full bg-white align-middle text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white  "
@@ -96,9 +96,9 @@ const Header = () => {
                     height={38}
                     alt="Image Description"
                   />
-                </button>
+                </button> */}
 
-                <div
+                {/* <div
                   className="hs-dropdown-menu duration hidden min-w-[15rem] rounded-lg bg-white p-2 opacity-0 shadow-md transition-[opacity,margin] hs-dropdown-open:opacity-100  "
                   aria-labelledby="hs-dropdown-with-header"
                 >
@@ -115,11 +115,29 @@ const Header = () => {
                         signOut().catch((err) => console.log(err));
                       }}
                     >
-                      <MdLogout className="mr-2 h-5 w-5 text-gray-400" />
+                       <LogoutIcon className="mr-2 h-5 w-5 text-gray-400" /> 
                       Sign out
                     </button>
+                    <button
+                      className="flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500  "
+                      onClick={() => {
+                        console.log("âyeme");
+                      }}
+                    >
+                      <MdPayment className="mr-2 h-5 w-5 text-gray-400" />
+                      Payment
+                    </button>
                   </div>
-                </div>
+                </div> */}
+                <button
+                  className="flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500  "
+                  onClick={() => {
+                    signOut().catch((err) => console.log(err));
+                  }}
+                >
+                  {/* <LogoutIcon className="mr-2 h-5 w-5 text-gray-400" /> */}
+                  Sign out
+                </button>
               </div>
             </div>
           </div>
