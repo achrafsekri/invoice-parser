@@ -72,6 +72,7 @@ const ParserForm = ({ paperType }) => {
     };
     createInvoice(invoice)
       .then((res) => {
+        console.log("res", res);
         setLoading(false);
         router.push("/my-invoices");
       })

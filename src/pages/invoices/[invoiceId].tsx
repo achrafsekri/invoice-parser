@@ -31,7 +31,7 @@ const Invoice = () => {
       <div className="border border-gray-300 p-4">
         {!isLoading && !isError && (
           <Editor
-            value={invoiceinfo}
+            value={"<pre>" + JSON.stringify(invoiceinfo, null, 2) + "</pre>"}
             readOnly={true}
             style={{ height: "320px" }}
           />
